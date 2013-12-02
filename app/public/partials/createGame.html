@@ -1,0 +1,12 @@
+<div>
+    Pick how many players you want to play with<br>
+    <select ng-model="newGame.numPlayers">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+    </select>
+
+    Name: <input type="text" ng-model="newGame.name">
+    <button class="btn btn-small" ng-click="createGame()">Create Game</button>
+</div>

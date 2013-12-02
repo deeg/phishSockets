@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <title>Quality Work Flow</title>
+    <link rel='stylesheet' href='/css/jquery-ui.min.css'/>
+    <link rel='stylesheet' href='/css/bootstrap.min.css'/>
+    <link rel='stylesheet' href='/css/style.css'/>
+</head>
+<body ng-app="phish" id="phish" ng-cloak>
+<div class="container">
+    <nav class="navbar navbar-default" role="navigation">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#"><img src="img/logo.png">Phish Sockets</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="javascript:void(0)">(Create Game)</a></li>
+                <li><a href="javascript:void(0)">(Join Game)</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Help</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Fun Links<b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="">Portfolio Pages</a></li>
+                        <li><a href="">Portfolio Dashboard</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</div>
+<div class="container" ng-view>
+
+
+</div>
+</body>
+
+<script src="/js/lib/jquery/jquery.min.js"></script>
+<script src="/js/lib/jquery/jquery-ui.min.js"></script>
+<script src="/js/lib/jquery/jquery-inputmask.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/lib/underscore.js"></script>
+<script src="/js/lib/bootstrap/bootstrap.js"></script>
+<script src="/js/lib/humane.min.js"></script>
+<script src="/js/lib/tinymce/tinymce.min.js"></script>
+<script src="/js/lib/angular/angular.js"></script>
+<script src="/js/lib/angular/angular-route.min.js"></script>
+<script src="/js/lib/angular/angular-resource.min.js"></script>
+<script src="/js/lib/angular/angular-sanitize.min.js"></script>
+<script src="/js/lib/angular/angular-sortable.js"></script>
+<script src="/js/lib/angular/angular-modal.js"></script>
+<script src="/js/lib/angular/angular-tinymce.js"></script>
+<script src="/js/lib/angular/angular-select-key.js"></script>
+<script src="/js/lib/angular/angular-validate.js"></script>
+<script src="/js/lib/angular/angular-mask.js"></script>
+<script src="/js/lib/angular/angular-uidate.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/services.js"></script>
+<script src="/js/controllers/GameCtrl.js"></script>
+<script src="/js/controllers/GameCreationCtrl.js"></script>
+<script src="/js/filters.js"></script>
+<script src="/js/directives.js"></script>
+</html>
