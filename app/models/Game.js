@@ -3,6 +3,7 @@ var mongoose = require('mongoose')
 module.exports = function (dal) {
     var PlayerSchema = mongoose.Schema({
         id: String,
+        proceed: Boolean,
         name: String,
         status: String
     }, { _id: false })

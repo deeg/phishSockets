@@ -1,3 +1,4 @@
+var _ = require('underscore');
 
 module.exports = function(app, config, Game) {
     var server = require('http').createServer(app),
@@ -29,7 +30,10 @@ module.exports = function(app, config, Game) {
     io.sockets.on('connection', function (socket) {
         // Globals set in join that will be available to
         // the other handlers defined on this connection
-        var _room, _id, _playerId, _playerName;
+        var _room, _id, _playerId, _playerName, _game;
+
+        //A object to tell when to proceed.
+        var _proceed = {};
 
         /*
         * This gets fired when a client emits the join call.
@@ -51,6 +55,7 @@ module.exports = function(app, config, Game) {
                     _room = game.room;
                     _playerId = data.player;
                     _playerName = data.playerName
+                    _game = game;
 
                     // Join the room.
                     socket.join( _room );
@@ -76,12 +81,44 @@ module.exports = function(app, config, Game) {
                     // and notify everyone the game can begin
                     if ( pcnt == game.numPlayers ) {
                         game.save(function( err, game ) {
-                            io.sockets.in( _room ).emit( 'ready' );
+                            _game = game;
+                            io.sockets.in( _room ).emit( 'game:ready' );
                         });
                     }
                 }
             });
         });
+
+        socket.on('proceed:accept', function(data){
+            data.player.proceed = true;
+            Game.findOneAndUpdate(
+                {'_id': data.game._id, 'players.id': data.player.id},
+                {$set: {'players.$': data.player}},
+                function(err, game){
+                    console.log(game);
+                    if(!game){
+                        //TODO: Handle no game found here
+                    }
+                    //Check to see if all players have proceeded, if so emit event
+                    var proceed = true;
+                    _.each(game.players, function(player, i){
+                        if(!player.proceed){
+                            proceed = false;
+                        }
+                    });
+                    console.log(proceed);
+                    if(proceed){
+                        //Clear out proceeded booleans and save game
+                        _.each(game.players, function(player, i){
+                            player.proceed = false;
+                        });
+                        game.save(function(err, game){
+                            io.sockets.in( _room ).emit( 'proceed');
+                        })
+                    }
+                }
+            )
+        })
     });
 
     return {server: server, io: io};

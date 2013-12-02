@@ -4,8 +4,14 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
 
     //Opponent object
     $scope.opponent = {}
+    //Player object
     $scope.player = {};
+    //Main status message to display to the user.
+    $scope.statusMessage = '';
+    //A variable to show when you want the user to accept moving on to the next stage.
+    $scope.showReady = false;
 
+    //Sets the player and opponent objects.
     $scope.setPlayerAndOpponent = function(pid){
         _.each($scope.game.players, function(player, i){
             if(pid == player.id){
@@ -22,9 +28,16 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
         })
     }
 
+    //A function which gets called when you hit the ready button
+    //This signifies the user is ready to proceed to the next step.
+    $scope.ready = function(){
+        socket.emit('proceed:accept', {player: $scope.player, game: $scope.game});
+    }
+
     // Wait for connection and then emit the join message with
     // the room and player ID provided in the API response.
     socket.on( 'connect', function() {
+        $scope.statusMessage = 'Waiting for more players...';
         socket.emit( 'join', { room: $rootScope.game.room, player: $rootScope.game.player,
             playerName:  $rootScope.game.playerName} );
     });
@@ -50,5 +63,16 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
             $scope.setPlayerAndOpponent($scope.player.id);
         })
 
+    });
+
+    socket.on('game:ready', function(){
+        $scope.$apply(function(){
+            $scope.statusMessage = 'All players have joined! Click READY to begin the game. Once both players have clicked ready, the first question will be asked in 3 seconds.'
+            $scope.showReady = true;
+        })
+    })
+
+    socket.on('proceed', function(){
+        console.log('proceed');
     })
 }
