@@ -10,6 +10,8 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
     $scope.statusMessage = '';
     //A variable to show when you want the user to accept moving on to the next stage.
     $scope.showReady = false;
+    $scope.disableReady = false;
+    $scope.showQuestionAnswers = false;
 
     //Sets the player and opponent objects.
     $scope.setPlayerAndOpponent = function(pid){
@@ -31,6 +33,7 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
     //A function which gets called when you hit the ready button
     //This signifies the user is ready to proceed to the next step.
     $scope.ready = function(){
+        $scope.disableReady = true;
         socket.emit('proceed:accept', {player: $scope.player, game: $scope.game});
     }
 
@@ -72,7 +75,21 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
         })
     })
 
-    socket.on('proceed', function(){
-        console.log('proceed');
+    socket.on('question:ask', function(data){
+        $scope.$apply(function(){
+            $scope.showReady = false;
+            $scope.game = data.game
+            $scope.statusMessage = 'The question will be displayed in 3 seconds.'
+            $scope.question = $scope.game.questions[0];
+            $scope.question.answers = [$scope.question.answer, $scope.question.fakeAnswer1,
+                $scope.question.fakeAnswer2, $scope.question.fakeAnswer3];
+            setTimeout(function(){
+                //After three second wait display question to players
+                $scope.$apply(function(){
+                    $scope.statusMessage = $scope.question.question;
+                    $scope.showQuestionAnswers = true;
+                })
+            }, 3000)
+        })
     })
 }

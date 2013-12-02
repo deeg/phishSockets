@@ -1,6 +1,6 @@
 var _ = require('underscore');
 
-module.exports = function(app, config, Game) {
+module.exports = function(app, config, Game, Question) {
     var server = require('http').createServer(app),
         io = require('socket.io').listen(server);
 
@@ -112,8 +112,28 @@ module.exports = function(app, config, Game) {
                         _.each(game.players, function(player, i){
                             player.proceed = false;
                         });
+                        game.status = 'question'
+                        game.questionNumber = 1;
                         game.save(function(err, game){
-                            io.sockets.in( _room ).emit( 'proceed');
+                            if(game.status == 'question' && game.questionNumber == 1){
+                            /*
+                             * We are ready to ask the first question, get the three questions to be asked put
+                             * them in the game array.
+                             * Save and send first question to players
+                             * */
+                                //TODO: Get random three questions here, for now hard coding
+                                Question.find(function(err, questions){
+                                    game.questions = questions;
+                                    game.save(function(err, game){
+                                        //Hide the later questions for the players
+                                        game.questions = game.questions[0];
+                                        io.sockets.in( _room ).emit('question:ask', {game: game});
+                                    })
+                                })
+
+
+
+                             }
                         })
                     }
                 }

@@ -21,6 +21,7 @@ angular.module('phish', ['phish.filters', 'phish.services', 'phish.directives', 
             .when('/createGame', { templateUrl: '/partials/createGame.html', controller: GameCreationCtrl})
             .when('/joinGame', { templateUrl: '/partials/joinGame.html', controller: GameCreationCtrl})
             .when('/playGame', { templateUrl: '/partials/playGame.html', controller: GameCtrl})
+            .when('/addQuestion', { templateUrl: '/partials/addQuestion.html', controller: AddQuestionCtrl})
             .otherwise({ templateUrl: '/partials/404.html' });
 
         /*

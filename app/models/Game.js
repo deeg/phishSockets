@@ -8,13 +8,27 @@ module.exports = function (dal) {
         status: String
     }, { _id: false })
 
+    var QuestionSchema = mongoose.Schema({
+        question: String,
+        answer: String,
+        fakeAnswer1: String,
+        fakeAnswer2: String,
+        fakeAnswer3: String,
+        additionalInfo: String,
+        answeredCorrectly: Boolean,
+        winningUser: String
+
+    });
+
     var GameSchema = mongoose.Schema({
 
         room: { type: String },
         round: Number,
         status: String,
+        questionNumber: Number,
         numPlayers: Number,
-        players: [PlayerSchema]
+        players: [PlayerSchema],
+        questions: [QuestionSchema]
 
     });
 

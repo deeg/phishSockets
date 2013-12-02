@@ -2,6 +2,12 @@
     <div class="alert alert-info">Room Name: {{game.room}}</div>
     <div class="alert alert-info">{{statusMessage}}</div>
 
+    <div class="row center" ng-show="showQuestionAnswers">
+        <p ng-repeat="answer in question.answers">
+            <button type="button" class="btn btn-primary btn-lg">{{answer}}</button>
+        </p>
+    </div>
+
     <div class="row center">
         <span class="glyphicon glyphicon-user"
               ng-class="{filled: opponent.name && opponent.name != 'Open'}"></span> {{opponent.name}}
@@ -14,6 +20,7 @@
     </div>
 
     <div class="ready" ng-show="showReady">
-        <button class="btn btn-success btn-block" ng-click="ready()">READY</button>
+        <button class="btn btn-success btn-block" ng-click="ready()"
+                ng-disabled="disableReady">READY</button>
     </div>
 </div>
