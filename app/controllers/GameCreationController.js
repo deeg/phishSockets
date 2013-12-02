@@ -94,6 +94,7 @@ module.exports = function (app, Game) {
                                 data = game.toJSON();
                                 data.action = 'join';
                                 data.player = pid;
+                                data.playerName = player.name
 
                                 res.send( data );
                             } else {

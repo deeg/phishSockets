@@ -1,3 +1,16 @@
-<div>
-    Room: {{game.room}}
+<div class="well well-lg sectionWell" ng-controller="GameCtrl">
+    Room Name: {{game.room}}
+    <div class="row">
+        <div class="col-md-offset-6 col-md-6">
+            <span class="glyphicon glyphicon-user"
+                  ng-class="{filled: opponent.name}"></span> {{opponent.name}}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-offset-6 col-md-6">
+            <span class="glyphicon glyphicon-user"
+                    ng-class="{filled: player.name}"></span> {{player.name}}
+        </div>
+    </div>
 </div>

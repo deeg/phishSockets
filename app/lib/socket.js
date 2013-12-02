@@ -5,13 +5,40 @@ module.exports = function(app, config, Game) {
 
     /*
      * Socket Logic
+     *
+     * The logic in this section is as if you were interacting with one person, who we will refer to as the client.
+     *  -send to current request socket client
+     *  socket.emit('message', "this is a test");
+     *
+     * -sending to all clients, include client
+     * io.sockets.emit('message', "this is a test");
+     *
+     * -sending to all clients except client
+     * socket.broadcast.emit('message', "this is a test");
+     *
+     * -sending to all clients in 'game' room(channel) except client
+     * socket.broadcast.to('game').emit('message', 'nice game');
+     *
+     * -sending to all clients in 'game' room(channel), include client
+     * io.sockets.in('game').emit('message', 'cool game');
+     *
+     * -sending to individual socketid
+     * io.sockets.socket(socketid).emit('message', 'for your eyes only');
+     *
      * */
     io.sockets.on('connection', function (socket) {
         // Globals set in join that will be available to
         // the other handlers defined on this connection
-        var _room, _id, _player;
+        var _room, _id, _playerId, _playerName;
 
-        socket.on( 'join', function ( data ) {
+        /*
+        * This gets fired when a client emits the join call.
+        * data.room = roomId
+        * data.player = client playedId
+        * data.playerName = client playerName
+        * */
+
+        socket.on('join', function ( data ) {
             // Static helper to lookup of a game based on the room
             Game.findByRoom( data.room, function( err, game ) {
                 var pcnt = 0, pidx;
@@ -22,15 +49,22 @@ module.exports = function(app, config, Game) {
                     // Remember this for later
                     _id = game._id;
                     _room = game.room;
-                    _player = data.player;
+                    _playerId = data.player;
+                    _playerName = data.playerName
 
                     // Join the room.
                     socket.join( _room );
 
-                    // Now emit messages to everyone else in this room.  If other
-                    // players in this game are connected, only those clients
-                    // will receive the message
-                    io.sockets.in( _room ).emit( 'joined' );
+                    /*
+                     * Emit message to everyone except sender that a new player has joined.
+                     * This will signify to fill in their opponent name bubble
+                     * */
+                    socket.broadcast.to( _room ).emit( 'player:joined', {game: game} );
+                    /*
+                     * Tell the player they have joined the room. This will tell them to fill in the user bubble
+                     * with their name.
+                     * */
+                    socket.emit( 'you:joined', {game: game, playerId: _playerId});
 
                     // Now, check if everyone is here
                     game.players.forEach(function( p ) {

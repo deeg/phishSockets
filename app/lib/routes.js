@@ -1,4 +1,4 @@
-module.exports = function (app, ApiController, HomeController, GameCreationController, Game, models, socket) {
+module.exports = function (app, ApiController, HomeController, GameCreationController, Game, models) {
 
     // Home
     //app.resource(app.controllers.home);
