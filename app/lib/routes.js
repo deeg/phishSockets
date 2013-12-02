@@ -3,6 +3,9 @@ module.exports = function (app, ApiController, HomeController, GameCreationContr
     // Home
     //app.resource(app.controllers.home);
     app.get('/', HomeController.index);
+    app.get('/joinGame', HomeController.index);
+    app.get('/createGame', HomeController.index);
+    app.get('/playGame', HomeController.index);
 
     /*
     * Create / Join Game Endpoints

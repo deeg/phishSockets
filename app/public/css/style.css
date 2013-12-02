@@ -12,6 +12,10 @@
     color:blue;
 }
 
+#bs-example-navbar-collapse-1 {
+    margin-top:14px;
+}
+
 /* selector for element and children */
 .noCss,.noCss *,.noCss a:hover,.noCss a:visited,.noCss a:active{
     background:none !important;

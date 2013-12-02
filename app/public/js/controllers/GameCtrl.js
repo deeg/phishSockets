@@ -1,6 +1,3 @@
-'use strict';
-
-
 function GameCtrl($scope,$rootScope, $http, $location, Game) {
     // Open socket
     var socket = io.connect();
