@@ -12,6 +12,10 @@
     color:blue;
 }
 
+.center{
+    text-align: center
+}
+
 #bs-example-navbar-collapse-1 {
     margin-top:14px;
 }
