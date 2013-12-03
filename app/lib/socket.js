@@ -1,6 +1,7 @@
 var _ = require('underscore');
 
 module.exports = function(app, config, Game, Question) {
+    console.log(app)
     var server = require('http').createServer(app),
         io = require('socket.io').listen(server);
 
@@ -54,6 +55,10 @@ module.exports = function(app, config, Game, Question) {
                     _id = game._id;
                     _room = game.room;
                     _playerId = data.player;
+
+                    socket.set('playerId', _playerId, function () {
+                    });
+
                     _playerName = data.playerName
                     _game = game;
 
@@ -124,6 +129,12 @@ module.exports = function(app, config, Game, Question) {
                                 //TODO: Get random three questions here, for now hard coding
                                 Question.find(function(err, questions){
                                     game.questions = questions;
+
+                                    //TODO: Change this
+                                    _.each(game.questions, function(e, i){
+                                        e.answeredCorrectly = false;
+                                    })
+
                                     game.save(function(err, game){
                                         //Hide the later questions for the players
                                         game.questions = game.questions[0];
@@ -138,6 +149,44 @@ module.exports = function(app, config, Game, Question) {
                     }
                 }
             )
+        });
+
+        socket.on('question:answer', function(data){
+            socket.get('playerId', function (err, playerId) {
+                if(err) console.log(err);
+                var answeredCorrectly = data.answeredCorrectly;
+                var game = data.game;
+                var question = data.question;
+
+                //If the question was answered correctly, update the game object
+                if(answeredCorrectly){
+                    question.answeredCorrectly = true;
+                    question.winningUser = playerId;
+                    //Answered correctly
+                    Game.findOneAndUpdate(
+                        {'_id': data.game._id, status: 'question', 'questions._id': question._id},
+                        {$set: {'status': 'waiting', 'questions.$': question}},
+                        function(err, game){
+                            if(game){
+                                //Player successfully got the answer correct first.
+
+                                //Tell the player they got the question right
+                                socket.emit('question:correct');
+
+                                //Tell everyone else in the room who got the question right
+                                socket.broadcast.to(game.room).emit('question:answered', {playerId: playerId})
+                            }else{
+                                //Player did not answer first, they did not win the question.
+                                //We do not have to do anything here because the client will get the question:answered call
+                            }
+                        }
+                    );
+                }else{
+                    //Answered incorrectly
+                    socket.emit('question:incorrect');
+                    //Check if both players have answered incorrectly, if so announce and move on.
+                }
+            });
         })
     });
 

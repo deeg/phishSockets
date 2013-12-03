@@ -4,7 +4,8 @@
 
     <div class="row center" ng-show="showQuestionAnswers">
         <p ng-repeat="answer in question.answers">
-            <button type="button" class="btn btn-primary btn-lg">{{answer}}</button>
+            <button type="button" class="btn btn-primary btn-lg"
+                    ng-disabled="answeredQuestion" ng-click="answerQuestion(answer)">{{answer}}</button>
         </p>
     </div>
 
