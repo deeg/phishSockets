@@ -26,6 +26,7 @@ module.exports = function (dal) {
         round: Number,
         status: String,
         questionNumber: Number,
+        playersAnswered: Number,
         numPlayers: Number,
         players: [PlayerSchema],
         questions: [QuestionSchema]

@@ -85,6 +85,8 @@ module.exports = function(app, config, Game, Question) {
                     // If so, update statuses, initialize
                     // and notify everyone the game can begin
                     if ( pcnt == game.numPlayers ) {
+                        //Set the status to question so we know the next step is to ask the first question
+                        game.status = 'question'
                         game.save(function( err, game ) {
                             _game = game;
                             io.sockets.in( _room ).emit( 'game:ready' );
@@ -111,16 +113,16 @@ module.exports = function(app, config, Game, Question) {
                             proceed = false;
                         }
                     });
-                    console.log(proceed);
                     if(proceed){
                         //Clear out proceeded booleans and save game
                         _.each(game.players, function(player, i){
                             player.proceed = false;
                         });
-                        game.status = 'question'
-                        game.questionNumber = 1;
+
                         game.save(function(err, game){
-                            if(game.status == 'question' && game.questionNumber == 1){
+                            if(game.status == 'question'){
+                                //Set the question number to 1 since it is the first question.
+                                game.questionNumber = 1;
                             /*
                              * We are ready to ask the first question, get the three questions to be asked put
                              * them in the game array.
@@ -141,10 +143,15 @@ module.exports = function(app, config, Game, Question) {
                                         io.sockets.in( _room ).emit('question:ask', {game: game});
                                     })
                                 })
-
-
-
-                             }
+                             }else{
+                                //Status is waiting we are ready to move to the next question
+                                game.questions = game.questions[game.questionNumber - 1];
+                                //We need to set the status here to question since we are no longer waiting.
+                                game.status = 'question';
+                                game.save(function(err){
+                                    io.sockets.in( _room ).emit('question:ask', {game: game});
+                                })
+                            }
                         })
                     }
                 }
@@ -155,7 +162,6 @@ module.exports = function(app, config, Game, Question) {
             socket.get('playerId', function (err, playerId) {
                 if(err) console.log(err);
                 var answeredCorrectly = data.answeredCorrectly;
-                var game = data.game;
                 var question = data.question;
 
                 //If the question was answered correctly, update the game object
@@ -165,7 +171,7 @@ module.exports = function(app, config, Game, Question) {
                     //Answered correctly
                     Game.findOneAndUpdate(
                         {'_id': data.game._id, status: 'question', 'questions._id': question._id},
-                        {$set: {'status': 'waiting', 'questions.$': question}},
+                        {$set: {'status': 'waiting', playersAnswered: 0, 'questions.$': question}, $inc: {'questionNumber': 1}},
                         function(err, game){
                             if(game){
                                 //Player successfully got the answer correct first.
@@ -183,8 +189,26 @@ module.exports = function(app, config, Game, Question) {
                     );
                 }else{
                     //Answered incorrectly
-                    socket.emit('question:incorrect');
                     //Check if both players have answered incorrectly, if so announce and move on.
+                    Game.findOneAndUpdate(
+                        {'_id': data.game._id},
+                        {$inc: { playersAnswered: 1}},
+                        function(err, game){
+                            if(game){
+                                //Check if the players answered == numOfPlayers, if so everyone got it wrong.
+                                if(game.playersAnswered == game.numPlayers){
+                                    game.status = 'waiting';
+                                    game.playersAnswered = 0
+                                    game.questionNumber = game.questionNumber + 1;
+                                    game.save(function(err){
+                                        io.sockets.in(game.room).emit('question:fail');
+                                    })
+                                }else{
+                                    socket.emit('question:incorrect');
+                                }
+                            }
+                        }
+                    );
                 }
             });
         })

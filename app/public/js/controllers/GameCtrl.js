@@ -49,6 +49,15 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
             game: $scope.game, question: $scope.question});
     }
 
+    //A helper function to reset the question, and show the ready button to proceed to the next question.
+    $scope.resetQuestion = function(){
+        $scope.question = {};
+        $scope.showQuestionAnswers = false;
+        $scope.disableReady = false;
+        $scope.showReady = true;
+        $scope.answeredQuestion = false;
+    }
+
     // Wait for connection and then emit the join message with
     // the room and player ID provided in the API response.
     socket.on( 'connect', function() {
@@ -117,10 +126,7 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
             //Client got the answer correct
             $scope.statusMessage = 'You got the question correct! Press ready to move to the next question.';
             $scope.score.player = 1;
-            $scope.question = {};
-            $scope.showQuestionAnswers = false;
-            $scope.disableReady = false;
-            $scope.showReady = true;
+            $scope.resetQuestion();
         })
     })
 
@@ -128,10 +134,14 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
         $scope.$apply(function(){
             $scope.statusMessage = 'Your opponent got the question correct. Press ready to move to the next question.'
             $scope.score.opponent = 1;
-            $scope.question = {};
-            $scope.showQuestionAnswers = false;
-            $scope.disableReady = false;
-            $scope.showReady = true;
+            $scope.resetQuestion();
+        })
+    })
+
+    socket.on('question:fail', function(){
+        $scope.$apply(function(){
+            $scope.statusMessage = 'FAIL! You both got it wrong. The answer was: ' + $scope.question.answer + '. Press ready to move to the next question.'
+            $scope.resetQuestion();
         })
     })
 }
