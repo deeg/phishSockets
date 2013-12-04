@@ -6,6 +6,8 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
     $scope.opponent = {}
     //Player object
     $scope.player = {};
+    //Score object
+    $scope.score = {};
     //Main status message to display to the user.
     $scope.statusMessage = '';
     //A variable to show when you want the user to accept moving on to the next stage.
@@ -114,6 +116,7 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
         $scope.$apply(function(){
             //Client got the answer correct
             $scope.statusMessage = 'You got the question correct! Press ready to move to the next question.';
+            $scope.score.player = 1;
             $scope.question = {};
             $scope.showQuestionAnswers = false;
             $scope.disableReady = false;
@@ -124,6 +127,7 @@ function GameCtrl($scope,$rootScope, $http, $location, Game) {
     socket.on('question:answered', function(data){
         $scope.$apply(function(){
             $scope.statusMessage = 'Your opponent got the question correct. Press ready to move to the next question.'
+            $scope.score.opponent = 1;
             $scope.question = {};
             $scope.showQuestionAnswers = false;
             $scope.disableReady = false;

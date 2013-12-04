@@ -12,12 +12,13 @@
     <div class="row center">
         <span class="glyphicon glyphicon-user"
               ng-class="{filled: opponent.name && opponent.name != 'Open'}"></span> {{opponent.name}}
+        <span ng-show="score.opponent">- {{score.opponent}}</span>
     </div>
 
 
     <div class="row center">
         <span class="glyphicon glyphicon-user"
-                ng-class="{filled: player.name}"></span> {{player.name}}
+                ng-class="{filled: player.name}"></span> {{player.name}} <span ng-show="score.player">- {{score.player}}</span>
     </div>
 
     <div class="ready" ng-show="showReady">
